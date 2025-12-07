@@ -1,6 +1,13 @@
+// server.js (GÜNCELLENMİŞ)
+
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
+
+// ===============================================
+// 1. ADIM: Auth Router'ı içeri aktarıyoruz
+const authRoutes = require('./src/routes/authRoutes');
+// ===============================================
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +33,14 @@ app.get('/', (req, res) => {
         version: 'v1'
     });
 });
+
+
+// ===============================================
+// 2. ADIM: Express'e rotaları tanıtıyoruz
+// Tüm Auth rotaları (register, login, vb.) /api/auth altında çalışacak.
+app.use('/api/auth', authRoutes);
+// ===============================================
+
 
 const startServer = async () => {
     await connectDB();
