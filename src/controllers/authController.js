@@ -10,7 +10,7 @@ const generateToken = (id, role) => {
 };
 // Refresh Token
 //uzun ömür
-const genereteRefreshToken = (id, role) => {
+const generateRefreshToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: "7d",
   });
@@ -44,7 +44,7 @@ const registerUser = async (req, res) => {
       role,
     });
     if (user) {
-      res.status(201).jjson({
+      res.status(201).json({
         _id: user._id,
         email: user.email,
         role: user.role,
@@ -77,7 +77,7 @@ const loginUser = async (req, res) => {
         email: user.email,
         role: user.role,
         accessToken: generateToken(user._id, user.role),
-        refreshToken: genereteRefreshToken(user._id, user.role),
+        refreshToken: generateRefreshToken(user._id, user.role),
       });
     } else {
       res.status(401).json({ message: "Geçersiz e-posta veya şifre." });

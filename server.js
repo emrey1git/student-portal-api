@@ -6,7 +6,9 @@ require('dotenv').config();
 
 // ===============================================
 // 1. ADIM: Auth Router'ı içeri aktarıyoruz
-const authRoutes = require('./src/routes/authRoutes');
+const authRoutes = require('./src/routes/authRoutes.js');
+//student routes
+const studentRoutes = require('./src/routes/studentRoutes.js')
 // ===============================================
 
 const app = express();
@@ -39,6 +41,7 @@ app.get('/', (req, res) => {
 // 2. ADIM: Express'e rotaları tanıtıyoruz
 // Tüm Auth rotaları (register, login, vb.) /api/auth altında çalışacak.
 app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
 // ===============================================
 
 
