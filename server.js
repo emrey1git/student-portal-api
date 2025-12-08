@@ -46,6 +46,14 @@ app.use('/api/students', studentRoutes);
 
 
 const startServer = async () => {
+    // Gerekli ortam değişkenleri hakkında kısa bir kontrol yapalım (geliştirme için bilgilendirme)
+    const requiredEnv = ['MONGO_URI', 'ACCESS_TOKEN_SECRET', 'REFRESH_TOKEN_SECRET'];
+    const missing = requiredEnv.filter((v) => !process.env[v]);
+    if (missing.length) {
+        console.warn('⚠️ Eksik ortam değişkenleri bulundu:', missing.join(', '));
+        console.warn('Lütfen `.env` dosyanıza gerekli değerleri ekleyin. (MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET)');
+    }
+
     await connectDB();
 
     app.listen(PORT, () => {

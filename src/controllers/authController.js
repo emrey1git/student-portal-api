@@ -1,9 +1,12 @@
-const User = require("../models/User");
+const User = require("../models/User.js");
 const jwt = require("jsonwebtoken"); // JWT üretimi için bu paketi kuracağız!
 
 // JWT Token Üretme Fonksiyonu
 // Access Token kısa ömürlü yap
 const generateToken = (id, role) => {
+  if (!process.env.ACCESS_TOKEN_SECRET) {
+    throw new Error('ACCESS_TOKEN_SECRET is not set in environment');
+  }
   return jwt.sign({ id, role }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "15m",
   });
@@ -11,6 +14,9 @@ const generateToken = (id, role) => {
 // Refresh Token
 //uzun ömür
 const generateRefreshToken = (id, role) => {
+  if (!process.env.REFRESH_TOKEN_SECRET) {
+    throw new Error('REFRESH_TOKEN_SECRET is not set in environment');
+  }
   return jwt.sign({ id, role }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: "7d",
   });
@@ -71,7 +77,7 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email }).select("+password");
 
     //kullanıcı yok veya şifre eşleşmiyor
-    if (User && (await user.matchPassword(password))) {
+    if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id,
         email: user.email,

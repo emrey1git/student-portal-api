@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -27,17 +27,16 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // --- Pre-Save Hook (Şifre Hashleme) --- Kullanıcı kaydedilmeden hemen önce çalışacak middleware
-UserSchema.pre('save', async function(text) {
+UserSchema.pre('save', async function() {
     // Şifre değiştirilmemişse veya yeni bir şifre değilse, hash'leme yapma
-    if(!this.isModified('password')) {
-        return next();
+    if (!this.isModified('password')) {
+        return;
     }
 
     // Şifreyi hash'le
-    const salt = await bcrypt.genSalt(10); //sayı yükseldikçe güvenlik artar ama performans düşer yavaşlar
-    this.password = await bcrypt.hash(this.password,salt);
-    next();
-})
+    const salt = await bcrypt.genSalt(10); // sayı yükseldikçe güvenlik artar ama performans düşer
+    this.password = await bcrypt.hash(this.password, salt);
+});
 
 // --- Method: Şifre Karşılaştırma ---
 UserSchema.methods.matchPassword = async function(enteredPassword) {
