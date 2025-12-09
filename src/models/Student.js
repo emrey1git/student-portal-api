@@ -53,5 +53,5 @@ const StudentSchema = new mongoose.Schema({
     timestamps: true // created/updated at alanlarını otomatik ekler
 });
 
-const Student = mongoose.model('Studemt', StudentSchema);
+const Student = mongoose.model('Student', StudentSchema);
 module.exports = Student;

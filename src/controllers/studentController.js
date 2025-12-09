@@ -71,8 +71,8 @@ const getStudentById = async (req, res) => {
         if (userRole === 'admin' || userRole === 'teacher') {
             return res.json(student);
         }
-        if (userRole === 'parent' && student.parent && student.parent.toString() === userId.toString()) {
-            return res.json(student);
+        if (userRole === 'parent' && student.parent && student.parent._id.toString() === userId.toString()) {
+             return res.json(student);
         }
         res.status(403).json({ message: 'Bu öğrencinin bilgilerini görmeye yetkiniz yoktur.' });
     } catch (error) {
