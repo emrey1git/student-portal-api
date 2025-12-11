@@ -78,12 +78,23 @@ const loginUser = async (req, res) => {
 
     //kullanıcı yok veya şifre eşleşmiyor
     if (user && (await user.matchPassword(password))) {
+
+      const refreshToken = generateRefreshToken(user._id, user.role);
+
+        // JWT Cookie Ayarları (Güvenlik için kritik)
+        res.cookie('jwt', refreshToken, {
+            httpOnly: true, // Sadece sunucu tarafından erişilebilir (XSS saldırılarını önler)
+            secure: process.env.NODE_ENV === 'production', // Sadece HTTPS'de gönder (Canlıda)
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 gün
+            sameSite: 'strict' // CSRF koruması
+        });
+
       res.json({
         _id: user._id,
         email: user.email,
         role: user.role,
         accessToken: generateToken(user._id, user.role),
-        refreshToken: generateRefreshToken(user._id, user.role),
+       
       });
     } else {
       res.status(401).json({ message: "Geçersiz e-posta veya şifre." });
@@ -92,5 +103,31 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: "Sunucu hatası: " + error.message });
   }
 };
+// @desc    Token'ı yeniler (Refresh Token kullanarak)
+// @route   GET /api/auth/refresh
+// @access  Private (Refresh Token ile)
+const handleRefreshToken = async (req, res) => {
+    // 1. Refresh Token'ı Cookie'den al
+    const cookies = req.cookies;
+    if (!cookies?.jwt) {
+        return res.status(401).json({ message: 'Yetkisiz erişim, Refresh Token bulunamadı.' });
+    }
 
-module.exports = { registerUser, loginUser };
+    const refreshToken = cookies.jwt;
+
+    // 2. Token'ı doğrula
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+        // 3. Yeni Access Token üret
+        const newAccessToken = generateToken(decoded.id, decoded.role);
+
+        res.json({ accessToken: newAccessToken });
+
+    } catch (error) {
+        // Token geçersizse veya süresi dolmuşsa
+        console.error('Refresh Token Hatası:', error.message);
+        res.status(403).json({ message: 'Yenileme Tokenı geçersiz veya süresi dolmuş.' });
+    }
+};
+module.exports = { registerUser, loginUser, handleRefreshToken};

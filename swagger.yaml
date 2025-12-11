@@ -1,0 +1,124 @@
+# swagger.yaml
+
+openapi: 3.0.0
+info:
+  title: Student Portal API
+  version: 1.0.0
+  description: Öğrenci, öğretmen ve veli rolleri için JWT korumalı CRUD API'si.
+
+servers:
+  - url: http://localhost:3000/api
+    description: Yerel Geliştirme Sunucusu
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+    
+    RegisterBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [admin, teacher, parent]
+          default: parent
+    
+    LoginBody:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Yeni Kullanıcı Kaydı (Admin, Öğretmen, Veli)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterBody'
+      responses:
+        '201':
+          description: Kullanıcı başarıyla kaydedildi ve token döndürüldü.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Validasyon Hatası (Joi) veya Kullanıcı Mevcut.
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Kullanıcı Girişi ve JWT/Refresh Token Alma
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+      responses:
+        '200':
+          description: Giriş başarılı. Access Token döndürüldü ve Refresh Token cookie'ye kaydedildi.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '401':
+          description: Geçersiz e-posta veya şifre.
+  
+  /auth/refresh:
+    get:
+      tags:
+        - Auth
+      summary: Refresh Token ile yeni Access Token alır
+      responses:
+        '200':
+          description: Yeni Access Token başarıyla verildi.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '401':
+          description: Refresh Token Cookie'si bulunamadı.
+        '403':
+          description: Token geçersiz veya süresi dolmuş.

@@ -1,7 +1,24 @@
 // src/middleware/authMiddleware.js
 
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // User modeline erişim
+const User = require('../models/User'); 
+const Joi = require('joi');
+
+const authValidation = require('../validations/authValidation'); 
+const studentValidation = require('../validations/studentValidation');
+const validateBody = (schema) => (req, res, next) => {
+    const { error } = schema.validate(req.body, {
+        abortEarly: false, 
+        allowUnknown: false
+    });
+
+    if (error) {
+        const errors = error.details.map(detail => detail.message);
+        return res.status(400).json({ message: 'Validasyon hatası.', errors });
+    }
+
+    next();
+};
 
 // --- 1. JWT Doğrulama Middleware'i (Auth Guard) ---
 const authGuard = async (req, res, next) => {
@@ -58,4 +75,4 @@ const isAdmin = hasRole(['admin']);
 const isTeacher = hasRole(['admin', 'teacher']);
 const isParent = hasRole(['admin', 'teacher', 'parent']); 
 
-module.exports = { authGuard, isAdmin, isTeacher, isParent };
+module.exports = { authGuard, isAdmin, isTeacher, isParent,validateBody, ...authValidation, ...studentValidation };

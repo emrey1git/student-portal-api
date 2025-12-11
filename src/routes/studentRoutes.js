@@ -15,8 +15,11 @@ const {
 const {
     authGuard,
     isAdmin,
-    isTeacher
+    isTeacher,
+    validateBody, studentSchema, updateStudentSchema
 } = require('../middleware/authMiddleware'); // Kontrol: Yol doğru olmalı
+
+
 
 const router = express.Router();
 
@@ -24,7 +27,7 @@ const router = express.Router();
 
 // @route   POST /api/students - Yeni öğrenci kaydı oluşturma
 // @access  Private (Admin ve Teacher)
-router.post('/', authGuard, isTeacher, createStudent);
+router.post('/', authGuard, isTeacher, validateBody(studentSchema), createStudent);
 
 // @route   GET /api/students - Tüm öğrencileri listeleme
 // @access  Private (Admin ve Teacher)
@@ -32,7 +35,7 @@ router.get('/', authGuard, isTeacher, getAllStudents);
 
 // @route   GET /api/students/:id - Belirli bir öğrencinin detaylarını getirme
 // @access  Private (Admin, Teacher ve Parent- kendi çocuğuysa)
-router.get('/:id', authGuard, getStudentById);
+router.put('/:id', authGuard, isTeacher, validateBody(updateStudentSchema), updateStudent);
 
 // @route   PUT /api/students/:id - Öğrenci bilgilerini güncelleme
 // @access  Private (Admin ve Teacher)

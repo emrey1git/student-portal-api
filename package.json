@@ -21,12 +21,16 @@
   },
   "homepage": "https://github.com/emrey1git/student-portal-api#readme",
   "dependencies": {
+    "@joi/date": "^2.1.1",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.0.1"
+    "mongoose": "^9.0.1",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
