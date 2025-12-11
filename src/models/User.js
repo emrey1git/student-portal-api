@@ -11,7 +11,10 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        // 🚨 GÜNCELLEME: Şifre, Google ID yoksa zorunlu olsun
+        required: function() {
+            return !this.googleId;
+        },
         select: false
     },
     role:{
